@@ -2,7 +2,7 @@
 
 ;; Author: Fanael Linithien <fanael4@gmail.com>
 ;; URL: https://github.com/Fanael/rainbow-identifiers
-;; Version: 0.1
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "24"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -199,6 +199,7 @@ rainbow-identifiers-identifier-<number>."
         (throw 'rainbow-identifiers--matcher t)))
     nil))
 
+;;;###autoload
 (define-minor-mode rainbow-identifiers-mode
   "Highlight identifiers according to their names.
 
