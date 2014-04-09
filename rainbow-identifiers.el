@@ -2,7 +2,7 @@
 
 ;; Author: Fanael Linithien <fanael4@gmail.com>
 ;; URL: https://github.com/Fanael/rainbow-identifiers
-;; Version: 0.1.1
+;; Version: 0.1.2
 ;; Package-Requires: ((emacs "24"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -170,7 +170,7 @@ rainbow-identifiers-identifier-<number>."
 
 (defun rainbow-identifiers--hash-function (identifier)
   "Hash function used to determine the face of IDENTIFIER."
-  (let* ((hash (secure-hash 'sha224 identifier nil nil t))
+  (let* ((hash (secure-hash 'sha1 identifier nil nil t))
          (len (length hash))
          (i (- len rainbow-identifiers--hash-bytes-to-use))
          (result 0))
