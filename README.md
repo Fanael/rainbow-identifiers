@@ -34,3 +34,17 @@ To change the colors, change faces
 
 To change the number of colors used, change the variable
 `rainbow-identifiers-face-count`.
+
+Version 0.1.3 introduced a way to change how colors/faces are
+chosen. By the fault the old behavior is used, but it can be changed
+by setting the variable `rainbow-identifiers-choose-face-function` to
+a function that takes a hash and returns a face specifier. Currently
+there are two such functions predefined:
+ * `rainbow-identifiers-predefined-choose-face`, the default, old behavior.
+ * `rainbow-identifiers-cie-l*a*b*-choose-face`, will generate colors
+   in the CIE L*a*b* color space without depending on any face. The
+   color generation can be influenced by changing the following
+   variables:
+    * `rainbow-identifiers-cie-l*a*b*-lightness`
+    * `rainbow-identifiers-cie-l*a*b*-saturation`
+    * `rainbow-identifiers-cie-l*a*b*-color-count`
