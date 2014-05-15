@@ -184,7 +184,7 @@ as a value of the `face' text property."
   :group 'rainbow-identifiers-faces)
 
 (defcustom rainbow-identifiers-face-count 15
-  "Number of faces used by for highlighting identifiers.
+  "Number of faces used for highlighting identifiers.
 
 You can increase this value if you define enough faces named
 rainbow-identifiers-identifier-<number>."
