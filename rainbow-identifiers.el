@@ -61,6 +61,32 @@ provided by the current major mode and other minor modes."
                  (const :tag "Yes" t))
   :group 'rainbow-identifiers)
 
+(defcustom rainbow-identifiers-choose-face-function
+  'rainbow-identifiers-default-choose-face
+  "The function used to choose faces used to highlight identifiers.
+It should take a single integer, which is the hash of the identifier
+currently being highlighting, and return a value suitable to use
+as a value of the `face' text property."
+  :type 'function
+  :group 'rainbow-identifiers)
+
+(defconst rainbow-identifiers--hash-bytes-to-use
+  (ceiling (/ (log most-positive-fixnum 2) 8.0))
+  "Number of bytes of returned hash to actually use.")
+
+(defun rainbow-identifiers--hash-function (identifier)
+  "Hash function used to determine the face of IDENTIFIER."
+  (let* ((hash (secure-hash 'sha1 identifier nil nil t))
+         (len (length hash))
+         (i (- len rainbow-identifiers--hash-bytes-to-use))
+         (result 0))
+    (while (< i len)
+      (setq result (+ (* result 256) (aref hash i)))
+      (setq i (1+ i)))
+    result))
+
+;; Default face chooser:
+
 (defgroup rainbow-identifiers-faces nil
   "Faces for highlighting identifiers."
   :group 'rainbow-identifiers
@@ -157,36 +183,19 @@ provided by the current major mode and other minor modes."
   :group 'rainbow-identifiers-faces)
 
 (defcustom rainbow-identifiers-face-count 15
-  "Number of faces used for highlighting identifiers.
+  "Number of faces used by for highlighting identifiers.
 
 You can increase this value if you define enough faces named
 rainbow-identifiers-identifier-<number>."
   :type 'integer
   :group 'rainbow-identifiers)
 
-(defconst rainbow-identifiers--hash-bytes-to-use
-  (ceiling (/ (log most-positive-fixnum 2) 8.0))
-  "Number of bytes of returned hash to actually use.")
-
-(defun rainbow-identifiers--hash-function (identifier)
-  "Hash function used to determine the face of IDENTIFIER."
-  (let* ((hash (secure-hash 'sha1 identifier nil nil t))
-         (len (length hash))
-         (i (- len rainbow-identifiers--hash-bytes-to-use))
-         (result 0))
-    (while (< i len)
-      (setq result (+ (* result 256) (aref hash i)))
-      (setq i (1+ i)))
-    result))
-
-(defun rainbow-identifiers--determine-face (identifier)
-  "Return the face IDENTIFIER should be fontified with."
+(defun rainbow-identifiers-default-choose-face (hash)
+  "Use HASH to choose one of the `rainbow-identifiers-identifier-N' faces."
   (intern-soft
    (concat "rainbow-identifiers-identifier-"
-           (number-to-string
-            (1+
-             (mod (rainbow-identifiers--hash-function identifier)
-                  rainbow-identifiers-face-count))))))
+           (number-to-string (1+ (mod hash rainbow-identifiers-face-count))))))
+
 
 (defvar rainbow-identifiers--face nil)
 
@@ -194,8 +203,9 @@ rainbow-identifiers-identifier-<number>."
   "The matcher function to be used by font lock mode."
   (catch 'rainbow-identifiers--matcher
     (while (re-search-forward (rx symbol-start (*? any) symbol-end) end t)
-      (let ((identifier (buffer-substring-no-properties (match-beginning 0) (match-end 0))))
-        (setq rainbow-identifiers--face (rainbow-identifiers--determine-face identifier))
+      (let* ((identifier (buffer-substring-no-properties (match-beginning 0) (match-end 0)))
+             (hash (rainbow-identifiers--hash-function identifier)))
+        (setq rainbow-identifiers--face (funcall rainbow-identifiers-choose-face-function hash))
         (throw 'rainbow-identifiers--matcher t)))
     nil))
 
