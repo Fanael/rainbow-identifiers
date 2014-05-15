@@ -2,7 +2,7 @@
 
 ;; Author: Fanael Linithien <fanael4@gmail.com>
 ;; URL: https://github.com/Fanael/rainbow-identifiers
-;; Version: 0.1.2
+;; Version: 0.1.3
 ;; Package-Requires: ((emacs "24"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -46,6 +46,7 @@
 ;; changing the faces `rainbow-identifiers-identifier-<number>'.
 
 ;;; Code:
+(require 'color)
 
 (defgroup rainbow-identifiers nil
   "Highlight identifiers according to their names."
@@ -62,7 +63,7 @@ provided by the current major mode and other minor modes."
   :group 'rainbow-identifiers)
 
 (defcustom rainbow-identifiers-choose-face-function
-  'rainbow-identifiers-default-choose-face
+  'rainbow-identifiers-predefined-choose-face
   "The function used to choose faces used to highlight identifiers.
 It should take a single integer, which is the hash of the identifier
 currently being highlighting, and return a value suitable to use
@@ -85,7 +86,7 @@ as a value of the `face' text property."
       (setq i (1+ i)))
     result))
 
-;; Default face chooser:
+;; Predefined face chooser:
 
 (defgroup rainbow-identifiers-faces nil
   "Faces for highlighting identifiers."
@@ -190,11 +191,56 @@ rainbow-identifiers-identifier-<number>."
   :type 'integer
   :group 'rainbow-identifiers)
 
-(defun rainbow-identifiers-default-choose-face (hash)
+(defun rainbow-identifiers-predefined-choose-face (hash)
   "Use HASH to choose one of the `rainbow-identifiers-identifier-N' faces."
   (intern-soft
    (concat "rainbow-identifiers-identifier-"
            (number-to-string (1+ (mod hash rainbow-identifiers-face-count))))))
+
+;; CIE L*a*b* face chooser:
+
+(defcustom rainbow-identifiers-cie-l*a*b*-lightness 50
+  "The lightness of the generated colors.
+
+Internally, this is the L* color coordinate."
+  :type 'number
+  :group 'rainbow-identifiers)
+
+(defcustom rainbow-identifiers-cie-l*a*b*-saturation 15
+  "The saturation of generated colors.
+
+Internally, this is the radius of a circle where the X and Y
+coordinates of a point on that circle are the a* and b* color
+coordinates, respectively."
+  :type 'number
+  :group 'rainbow-identifiers)
+
+(defcustom rainbow-identifiers-cie-l*a*b*-color-count 65536
+  "The number of different colors to generate."
+  :type 'integer
+  :group 'rainbow-identifiers)
+
+(defun rainbow-identifiers-cie-l*a*b*-choose-face (hash)
+  "Use HASH to choose a face with a generated foreground color.
+
+The colors are chosen from the CIE L*a*b* color space. If a color not
+representable in sRGB is chosen, the components are clamped.
+
+The color generation can be influenced by changing
+`rainbow-identifiers-cie-l*a*b*-lightness',
+`rainbow-identifiers-cie-l*a*b*-saturation' and
+`rainbow-identifiers-cie-l*a*b*-color-count'."
+  (let* ((bucket (float (mod hash rainbow-identifiers-cie-l*a*b*-color-count)))
+         (angle (* 2 float-pi (/ bucket rainbow-identifiers-cie-l*a*b*-color-count)))
+         (a (* rainbow-identifiers-cie-l*a*b*-saturation (cos angle)))
+         (b (* rainbow-identifiers-cie-l*a*b*-saturation (sin angle))))
+    (let ((color (color-lab-to-srgb rainbow-identifiers-cie-l*a*b*-lightness a b)))
+      ;; Clamp the color if the result is not representable in sRGB.
+      (let ((i color))
+        (while (consp i)
+          (setcar i (max 0.0 (min 1.0 (car i))))
+          (setq i (cdr i))))
+      (list :foreground (apply 'color-rgb-to-hex color)))))
 
 
 (defvar rainbow-identifiers--face nil)
