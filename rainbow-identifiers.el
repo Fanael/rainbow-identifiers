@@ -2,7 +2,7 @@
 
 ;; Author: Fanael Linithien <fanael4@gmail.com>
 ;; URL: https://github.com/Fanael/rainbow-identifiers
-;; Version: 0.2
+;; Version: 0.2.1
 ;; Package-Requires: ((emacs "24"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -250,7 +250,7 @@ The color generation can be influenced by changing
         (while (consp i)
           (setcar i (max 0.0 (min 1.0 (car i))))
           (setq i (cdr i))))
-      (list :foreground (apply 'color-rgb-to-hex color)))))
+      (list (list :foreground (apply 'color-rgb-to-hex color))))))
 
 
 ;; Face filter:
