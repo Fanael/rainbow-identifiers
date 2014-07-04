@@ -2,7 +2,7 @@
 
 ;; Author: Fanael Linithien <fanael4@gmail.com>
 ;; URL: https://github.com/Fanael/rainbow-identifiers
-;; Version: 0.1.3
+;; Version: 0.2
 ;; Package-Requires: ((emacs "24"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -53,15 +53,6 @@
   :prefix "rainbow-identifiers-"
   :group 'convenience)
 
-(defcustom rainbow-identifiers-override-other-highlighting nil
-  "If non-nil rainbow-identifiers will override other highlighting.
-
-This can, and almost certainly will, break all syntax highlighting
-provided by the current major mode and other minor modes."
-  :type '(choice (const :tag "No" nil)
-                 (const :tag "Yes" t))
-  :group 'rainbow-identifiers)
-
 (defcustom rainbow-identifiers-choose-face-function
   'rainbow-identifiers-predefined-choose-face
   "The function used to choose faces used to highlight identifiers.
@@ -69,6 +60,25 @@ It should take a single integer, which is the hash of the identifier
 currently being highlighting, and return a value suitable to use
 as a value of the `face' text property."
   :type 'function
+  :group 'rainbow-identifiers)
+
+(defcustom rainbow-identifiers-filter-functions '(rainbow-identifiers-face-overridable)
+  "Abnormal hook run to determine whether to rainbow-highlight an identifier.
+
+Two arguments are passed to each function: the position of the beginning and end
+of the identifier currently being considered.
+Each function should return non-nil if and only if it considers the identifier
+to be eligible to rainbow-highlighting.  Identifier is rainbow-highlighted only
+when all hook functions consider it eligible."
+  :type '(repeat function)
+  :group 'rainbow-identifiers)
+
+(defcustom rainbow-identifiers-faces-to-override nil
+  "List of faces that `rainbow-identifiers' is allowed to override.
+
+It has an effect only when `rainbow-identifiers-face-overridable' is in
+`rainbow-identifiers-filter-functions'."
+  :type '(repeat face)
   :group 'rainbow-identifiers)
 
 (defconst rainbow-identifiers--hash-bytes-to-use
@@ -243,16 +253,37 @@ The color generation can be influenced by changing
       (list :foreground (apply 'color-rgb-to-hex color)))))
 
 
+;; Face filter:
+
+(defun rainbow-identifiers-face-overridable (begin _end)
+  "Test if the face of the identifier under BEGIN is overridable."
+  (let ((face (get-text-property begin 'face)))
+    (cond
+     ((null face)
+      t)
+     ((listp face)
+      (catch 'rainbow-identifiers--face-overridable
+        (dolist (face* face)
+          (unless (memq face* rainbow-identifiers-faces-to-override)
+            (throw 'rainbow-identifiers--face-overridable nil)))
+        t))
+     (t
+      (memq face rainbow-identifiers-faces-to-override)))))
+
+
 (defvar rainbow-identifiers--face nil)
 
 (defun rainbow-identifiers--matcher (end)
   "The matcher function to be used by font lock mode."
   (catch 'rainbow-identifiers--matcher
     (while (re-search-forward (rx symbol-start (*? any) symbol-end) end t)
-      (let* ((identifier (buffer-substring-no-properties (match-beginning 0) (match-end 0)))
-             (hash (rainbow-identifiers--hash-function identifier)))
-        (setq rainbow-identifiers--face (funcall rainbow-identifiers-choose-face-function hash))
-        (throw 'rainbow-identifiers--matcher t)))
+      (let ((beginning (match-beginning 0))
+            (end (match-end 0)))
+        (when (run-hook-with-args-until-failure 'rainbow-identifiers-filter-functions beginning end)
+          (let* ((identifier (buffer-substring-no-properties beginning end))
+                 (hash (rainbow-identifiers--hash-function identifier)))
+            (setq rainbow-identifiers--face (funcall rainbow-identifiers-choose-face-function hash))
+            (throw 'rainbow-identifiers--matcher t)))))
     nil))
 
 ;;;###autoload
@@ -267,13 +298,10 @@ mode if ARG is omitted or nil, and toggle it if ARG is `toggle'."
   :init-value nil
   :lighter ""
   :keymap nil
-  (let ((keywords '((rainbow-identifiers--matcher . rainbow-identifiers--face))))
+  (let ((keywords '((rainbow-identifiers--matcher 0 rainbow-identifiers--face prepend))))
     (font-lock-remove-keywords nil keywords)
     (when rainbow-identifiers-mode
-      (font-lock-add-keywords nil keywords
-                              (if rainbow-identifiers-override-other-highlighting
-                                  nil
-                                'append))))
+      (font-lock-add-keywords nil keywords 'append)))
   ;; Refresh font locking.
   (when font-lock-mode
     (font-lock-mode)))
