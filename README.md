@@ -1,10 +1,10 @@
 # Rainbow identifiers mode
 
-Rainbow identifiers mode is an Emacs minor mode providing highlighting
-of identifiers based on their names. Each identifier gets a color
-based on a hash of its name.
+Rainbow identifiers mode is an Emacs minor mode providing highlighting of
+identifiers based on their names. Each identifier gets a color based on a hash
+of its name.
 
-![Screenshot of rainbow identifiers mode on its own code](https://raw.github.com/Fanael/rainbow-identifiers/master/rainbow-identifiers.png)
+![Screenshot of rainbow identifiers mode on its own code](https://raw.githubusercontent.com/Fanael/rainbow-identifiers/master/rainbow-identifiers.png)
 
 ## Installation
 
@@ -29,22 +29,30 @@ To turn it on automatically in most programming modes:
 
 ## Customization
 
-To change the colors, change faces
-`rainbow-identifiers-identifier-<number>`.
+To change the colors, change faces `rainbow-identifiers-identifier-<number>`.
 
 To change the number of colors used, change the variable
 `rainbow-identifiers-face-count`.
 
-Version 0.1.3 introduced a way to change how colors/faces are
-chosen. By the fault the old behavior is used, but it can be changed
-by setting the variable `rainbow-identifiers-choose-face-function` to
-a function that takes a hash and returns a face specifier. Currently
-there are two such functions predefined:
+Since version 0.1.3 it's possible to change how colors/faces are chosen. By
+default the old behavior is used, but it can be changed by setting the variable
+`rainbow-identifiers-choose-face-function` to a function that takes a hash and
+returns a face specifier. Currently there are two such functions predefined:
  * `rainbow-identifiers-predefined-choose-face`, the default, old behavior.
  * `rainbow-identifiers-cie-l*a*b*-choose-face`, will generate colors
-   in the CIE L*a*b* color space without depending on any face. The
+   in the CIE L\*a\*b\* color space without depending on any face. The
    color generation can be influenced by changing the following
    variables:
     * `rainbow-identifiers-cie-l*a*b*-lightness`
     * `rainbow-identifiers-cie-l*a*b*-saturation`
     * `rainbow-identifiers-cie-l*a*b*-color-count`
+
+Since version 0.2 it's possible to allow `rainbow-identifiers` to override some
+of the highlighting done by the major mode or other minor modes by setting
+`rainbow-identifiers-faces-to-override` to a list of faces `rainbow-identifiers`
+can override.
+
+Also since version 0.2 it's possible to reduce the number of identifiers
+highlighted by adding functions to the `rainbow-identifiers-filter-functions`
+hook. Only the identifiers for which all functions in the hook return non-nil
+are highlighted.
