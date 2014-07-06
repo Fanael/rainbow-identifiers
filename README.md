@@ -52,7 +52,6 @@ of the highlighting done by the major mode or other minor modes by setting
 `rainbow-identifiers-faces-to-override` to a list of faces `rainbow-identifiers`
 can override.
 
-Also since version 0.2 it's possible to reduce the number of identifiers
-highlighted by adding functions to the `rainbow-identifiers-filter-functions`
-hook. Only the identifiers for which all functions in the hook return non-nil
-are highlighted.
+Also since version 0.2 it's possible to filter which identifiers are highlighted
+by adding functions to the `rainbow-identifiers-filter-functions` hook. Only the
+identifiers for which all functions in the hook return non-nil are highlighted.
