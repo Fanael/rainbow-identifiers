@@ -1,3 +1,6 @@
+[![Melpa Status](http://melpa.milkbox.net/packages/rainbow-identifiers-badge.svg)](http://melpa.milkbox.net/#/rainbow-identifiers)
+[![Melpa Stable Status](http://melpa-stable.milkbox.net/packages/rainbow-identifiers-badge.svg)](http://melpa-stable.milkbox.net/#/rainbow-identifiers)
+
 # Rainbow identifiers mode
 
 Rainbow identifiers mode is an Emacs minor mode providing highlighting of
