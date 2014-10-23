@@ -1,5 +1,5 @@
-[![Melpa Status](http://melpa.milkbox.net/packages/rainbow-identifiers-badge.svg)](http://melpa.milkbox.net/#/rainbow-identifiers)
-[![Melpa Stable Status](http://melpa-stable.milkbox.net/packages/rainbow-identifiers-badge.svg)](http://melpa-stable.milkbox.net/#/rainbow-identifiers)
+[![Melpa Status](http://melpa.org/packages/rainbow-identifiers-badge.svg)](http://melpa.org/#/rainbow-identifiers)
+[![Melpa Stable Status](http://stable.melpa.org/packages/rainbow-identifiers-badge.svg)](http://stable.melpa.org/#/rainbow-identifiers)
 
 # Rainbow identifiers mode
 
@@ -11,7 +11,7 @@ of its name.
 
 ## Installation
 
-The package is available in [MELPA](http://melpa.milkbox.net/).
+The package is available in [MELPA](http://melpa.org/).
 
 If you have MELPA in `package-archives`, use
 
