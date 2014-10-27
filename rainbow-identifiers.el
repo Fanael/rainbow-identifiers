@@ -100,95 +100,24 @@ It has an effect only when `rainbow-identifiers-face-overridable' is in
   :group 'rainbow-identifiers
   :group 'faces)
 
-(defface rainbow-identifiers-identifier-1
-  '((((class color) (background dark)) :foreground "#9999bb")
-    (((class color) (background light)) :foreground "#78683f"))
-  "Identifier face #1"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-2
-  '((((class color) (background dark)) :foreground "#bb99b4")
-    (((class color) (background light)) :foreground "#43783f"))
-  "Identifier face #2"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-3
-  '((((class color) (background dark)) :foreground "#bba699")
-    (((class color) (background light)) :foreground "#3f7178"))
-  "Identifier face #3"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-4
-  '((((class color) (background dark)) :foreground "#a6bb99")
-    (((class color) (background light)) :foreground "#513f78"))
-  "Identifier face #4"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-5
-  '((((class color) (background dark)) :foreground "#99bbb4")
-    (((class color) (background light)) :foreground "#783f5a"))
-  "Identifier face #5"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-6
-  '((((class color) (background dark)) :foreground "#e0d0a0")
-    (((class color) (background light)) :foreground "#707e4f"))
-  "Identifier face #6"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-7
-  '((((class color) (background dark)) :foreground "#a3e0a0")
-    (((class color) (background light)) :foreground "#4f7e67"))
-  "Identifier face #7"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-8
-  '((((class color) (background dark)) :foreground "#a0d6e0")
-    (((class color) (background light)) :foreground "#4f5c7e"))
-  "Identifier face #8"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-9
-  '((((class color) (background dark)) :foreground "#b6a0e0")
-    (((class color) (background light)) :foreground "#7a4f7e"))
-  "Identifier face #9"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-10
-  '((((class color) (background dark)) :foreground "#e0a0bc")
-    (((class color) (background light)) :foreground "#7e544f"))
-  "Identifier face #10"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-11
-  '((((class color) (background dark)) :foreground "#a7c0b9")
-    (((class color) (background light)) :foreground "#783778"))
-  "Identifier face #11"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-12
-  '((((class color) (background dark)) :foreground "#a7aac0")
-    (((class color) (background light)) :foreground "#784437"))
-  "Identifier face #12"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-13
-  '((((class color) (background dark)) :foreground "#c0a7bd")
-    (((class color) (background light)) :foreground "#5e7837"))
-  "Identifier face #13"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-14
-  '((((class color) (background dark)) :foreground "#c0afa7")
-    (((class color) (background light)) :foreground "#37785e"))
-  "Identifier face #14"
-  :group 'rainbow-identifiers-faces)
-
-(defface rainbow-identifiers-identifier-15
-  '((((class color) (background dark)) :foreground "#b3c0a7")
-    (((class color) (background light)) :foreground "#374478"))
-  "Identifier face #15"
-  :group 'rainbow-identifiers-faces)
+(eval-when-compile
+  (defmacro rainbow-identifiers--define-faces ()
+    (let ((faces '())
+          (light-colors ["#78683f" "#43783f" "#3f7178" "#513f78" "#783f5a"
+                         "#707e4f" "#4f7e67" "#4f5c7e" "#7a4f7e" "#7e544f"
+                         "#783778" "#784437" "#5e7837" "#37785e" "#374478"])
+          (dark-colors ["#9999bb" "#bb99b4" "#bba699" "#a6bb99" "#99bbb4"
+                        "#e0d0a0" "#a3e0a0" "#a0d6e0" "#b6a0e0" "#e0a0bc"
+                        "#a7c0b9" "#a7aac0" "#c0a7bd" "#c0afa7" "#b3c0a7"]))
+      (dotimes (i 15)
+        (push `(defface ,(intern (format "rainbow-identifiers-identifier-%d" (1+ i)))
+                 '((((class color) (background dark)) :background ,(aref dark-colors i))
+                   (((class color) (background light)) :background ,(aref light-colors i)))
+                 ,(format "Identifier face #%d" (1+ i))
+                 :group 'rainbow-identifiers-faces)
+              faces))
+      `(progn ,@faces))))
+(rainbow-identifiers--define-faces)
 
 (defcustom rainbow-identifiers-face-count 15
   "Number of faces used for highlighting identifiers.
