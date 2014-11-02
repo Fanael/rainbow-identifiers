@@ -173,7 +173,7 @@ The color generation can be influenced by changing
     (let ((color (color-lab-to-srgb rainbow-identifiers-cie-l*a*b*-lightness a b)))
       ;; Clamp the color if the result is not representable in sRGB.
       (let ((i color))
-        (while (consp i)
+        (while i
           (setcar i (max 0.0 (min 1.0 (car i))))
           (setq i (cdr i))))
       (list (list :foreground (apply 'color-rgb-to-hex color))))))
