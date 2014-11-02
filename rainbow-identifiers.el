@@ -176,7 +176,7 @@ The color generation can be influenced by changing
         (while i
           (setcar i (max 0.0 (min 1.0 (car i))))
           (setq i (cdr i))))
-      (list (list :foreground (apply 'color-rgb-to-hex color))))))
+      (list (list :foreground (apply #'color-rgb-to-hex color))))))
 
 
 ;; Face filter:
